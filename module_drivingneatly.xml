@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_drivingneatly" default="compile.module.drivingneatly">
+  <dirname property="module.drivingneatly.basedir" file="${ant.file.module_drivingneatly}"/>
+  
+  <property name="module.jdk.home.drivingneatly" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.drivingneatly" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.drivingneatly" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.drivingneatly" value="-encoding UTF-8 -source 1.8 -target 1.8 ${compiler.args}"/>
+  
+  <property name="drivingneatly.output.dir" value="${module.drivingneatly.basedir}/out/production/DrivingNeatly"/>
+  <property name="drivingneatly.testoutput.dir" value="${module.drivingneatly.basedir}/out/test/DrivingNeatly"/>
+  
+  <path id="drivingneatly.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="drivingneatly.module.production.classpath">
+    <path refid="${module.jdk.classpath.drivingneatly}"/>
+  </path>
+  
+  <path id="drivingneatly.runtime.production.module.classpath">
+    <pathelement location="${drivingneatly.output.dir}"/>
+  </path>
+  
+  <path id="drivingneatly.module.classpath">
+    <path refid="${module.jdk.classpath.drivingneatly}"/>
+    <pathelement location="${drivingneatly.output.dir}"/>
+  </path>
+  
+  <path id="drivingneatly.runtime.module.classpath">
+    <pathelement location="${drivingneatly.testoutput.dir}"/>
+    <pathelement location="${drivingneatly.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.drivingneatly">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.drivingneatly">
+    <patternset refid="excluded.from.module.drivingneatly"/>
+  </patternset>
+  
+  <path id="drivingneatly.module.sourcepath">
+    <dirset dir="${module.drivingneatly.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.drivingneatly" depends="compile.module.drivingneatly.production,compile.module.drivingneatly.tests" description="Compile module DrivingNeatly"/>
+  
+  <target name="compile.module.drivingneatly.production" depends="register.custom.compilers" description="Compile module DrivingNeatly; production classes">
+    <mkdir dir="${drivingneatly.output.dir}"/>
+    <javac2 destdir="${drivingneatly.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.drivingneatly}/javac">
+      <compilerarg line="${compiler.args.drivingneatly}"/>
+      <bootclasspath refid="drivingneatly.module.bootclasspath"/>
+      <classpath refid="drivingneatly.module.production.classpath"/>
+      <src refid="drivingneatly.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.drivingneatly"/>
+    </javac2>
+    
+    <copy todir="${drivingneatly.output.dir}">
+      <fileset dir="${module.drivingneatly.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.drivingneatly.tests" depends="register.custom.compilers,compile.module.drivingneatly.production" description="compile module DrivingNeatly; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.drivingneatly" description="cleanup module">
+    <delete dir="${drivingneatly.output.dir}"/>
+    <delete dir="${drivingneatly.testoutput.dir}"/>
+  </target>
+</project>
