@@ -23,14 +23,14 @@ public abstract class Evaluator {
         this.populationSize = populationSize;
         this.nodeInnovation = nodeInnovation;
         this.connectionInnovation = connectionInnovation;
-        genomes = new ArrayList<Genome>(populationSize);
+        genomes = new ArrayList<>(populationSize);
         for (int i = 0; i < populationSize; i++) {
             genomes.add(new Genome(startingGenome));
         }
-        nextGenGenomes = new ArrayList<Genome>(populationSize);
-        speciesMap = new HashMap<Genome, Species>();
-        scoreMap = new HashMap<Genome, Float>();
-        species = new ArrayList<Species>();
+        nextGenGenomes = new ArrayList<>(populationSize);
+        speciesMap = new HashMap<>();
+        scoreMap = new HashMap<>();
+        species = new ArrayList<>();
     }
 
     public void evaluate() {

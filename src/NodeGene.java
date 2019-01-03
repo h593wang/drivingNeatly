@@ -4,6 +4,11 @@ public class NodeGene {
         this.id = id;
     }
 
+    public NodeGene(NodeGene gene) {
+        this.type = gene.type;
+        this.id = gene.id;
+    }
+
     public NodeGene copy() {
         return new NodeGene(type,id);
     }

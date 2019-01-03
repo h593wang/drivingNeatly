@@ -18,11 +18,11 @@ public class Genome {
         connections = new HashMap<>();
 
         for (Integer index : toBeCopied.nodes.keySet()) {
-            nodes.put(index, toBeCopied.nodes.get(index).copy());
+            nodes.put(index, new NodeGene(toBeCopied.nodes.get(index)));
         }
 
         for (Integer index : toBeCopied.connections.keySet()) {
-            connections.put(index, toBeCopied.connections.get(index).copy());
+            connections.put(index, new ConnectionGene(toBeCopied.connections.get(index)));
         }
     }
 
@@ -112,15 +112,18 @@ public class Genome {
     // assumes parent1 is more fit
     public static Genome crossover(Genome parent1, Genome parent2, Random r) {
         Genome child = new Genome();
-        for (NodeGene parentNode:parent1.nodes.values()) {
-            child.nodes.put(parentNode.id, parentNode.copy());
+
+        for (NodeGene parent1Node : parent1.nodes.values()) {
+            child.nodes.put(parent1Node.id,new NodeGene(parent1Node));
         }
 
-        for (ConnectionGene parent1Connection : parent1.connections.values()) {
-            if (parent2.connections.containsKey(parent1Connection.innovation)) { //matching gene
-                child.connections.put(parent1Connection.innovation, r.nextBoolean() ?  parent1Connection.copy(): parent2.connections.get(parent1Connection.innovation).copy());
-            } else { //disjoint or excess
-                child.connections.put(parent1Connection.innovation, parent1Connection.copy());
+        for (ConnectionGene parent1Node : parent1.connections.values()) {
+            if (parent2.connections.containsKey(parent1Node.innovation)) { // matching gene
+                ConnectionGene childConGene = r.nextBoolean() ? new ConnectionGene(parent1Node) : new ConnectionGene(parent2.connections.get(parent1Node.innovation));
+                child.connections.put(childConGene.innovation,childConGene);
+            } else { // disjoint or excess gene
+                ConnectionGene childConGene = new ConnectionGene(parent1Node);
+                child.connections.put(childConGene.innovation,childConGene);
             }
         }
         return child;
@@ -157,13 +160,13 @@ public class Genome {
             NodeGene node1 = genome1.nodes.get(i);
             NodeGene node2 = genome2.nodes.get(i);
             if (node1 == null && node2 != null) {
-                if (highestInnovation1 >= i) {
+                if (highestInnovation1 > i) {
                     disjointGenes++;
                 } else {
                     excessGenes++;
                 }
             } else if (node2 == null && node1 != null) {
-                if (highestInnovation2 >= i) {
+                if (highestInnovation2 > i) {
                     disjointGenes++;
                 } else {
                     excessGenes++;
@@ -191,13 +194,13 @@ public class Genome {
                 matchingGenes++;
                 weightDiff += Math.abs(connection1.weight - connection2.weight);
             } else if (connection1 == null && connection2 != null) {
-                if (highestInnovation1 >= i) {
+                if (highestInnovation1 > i) {
                     disjointGenes++;
                 } else {
                     excessGenes++;
                 }
             } else if (connection2 == null && connection1 != null) {
-                if (highestInnovation2 >= i) {
+                if (highestInnovation2 > i) {
                     disjointGenes++;
                 } else {
                     excessGenes++;

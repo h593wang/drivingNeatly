@@ -312,7 +312,7 @@ public class Main extends JFrame implements ActionListener {
         Evaluator eval = new Evaluator(100, genome, nodeInn, connInn) {
             @Override
             int evaluateGenome(Genome genome) {
-                return genome.connections.values().size();
+                return (1000/genome.connections.values().size());
             }
         };
         for (int i = 1; i <= 300; i++) {
