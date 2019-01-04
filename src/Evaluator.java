@@ -8,6 +8,7 @@ public abstract class Evaluator {
     private Counter connectionInnovation;
 
     private int populationSize;
+    public int passedPopulation = 0;
 
     public Map<Genome, Species> speciesMap;
     private Map<Genome, Float> scoreMap;
@@ -58,9 +59,6 @@ public abstract class Evaluator {
                 }
             }
             if (!foundSpecies) {
-                if (species.size() > 30) {
-                    System.out.println("oh no");
-                }
                 Species newSpecies = new Species(g);
                 newSpecies.id = counter;
                 counter++;
@@ -76,7 +74,7 @@ public abstract class Evaluator {
             Species s = speciesMap.get(genomes.get(i));
 
             float score = evaluateGenome(genomes.get(i), i);
-            if (score > Constants.MAX_FITNESS) s.foundSolution = true;
+            if (score > Constants.MAX_FITNESS) genomes.get(i).foundSolution = true;
             float adjustedScore = score / s.members.size();
 
             s.addAdjustedFitness(adjustedScore);
@@ -96,12 +94,23 @@ public abstract class Evaluator {
             species.get(0).stagnationGenCount = 0;
         }
 
+        //solved genomes gets a free pass
+        int passedPop = 0;
+        for (Genome g: genomes) {
+            if (g.foundSolution) {
+                nextGenGenomes.add(g);
+                passedPop++;
+            }
+        }
+        passedPopulation = passedPop;
         //best genomes gets a free pass
         for (Species s : species) {
             Collections.sort(s.fitnessPop, fitComp);
             Collections.reverse(s.fitnessPop);
             FitnessGenome fittestInSpecies = s.fitnessPop.get(0);
-            nextGenGenomes.add(fittestInSpecies.genome);
+            if (!fittestInSpecies.genome.foundSolution) {
+                nextGenGenomes.add(fittestInSpecies.genome);
+            }
         }
 
         //breeding the rest
@@ -197,7 +206,6 @@ public abstract class Evaluator {
         public float topFitness = 0;
         public int stagnationGenCount = 0;
         public int id;
-        public boolean foundSolution = false;
 
         public Species(Genome mascot) {
             this.mascot = mascot;
@@ -223,10 +231,6 @@ public abstract class Evaluator {
         }
 
         public boolean checkStagnation() {
-            if (foundSolution) {
-                stagnationGenCount = 0;
-                return false;
-            }
             if (totalAdjustedFitness > topFitness) {
                 topFitness = totalAdjustedFitness;
                 stagnationGenCount = 0;

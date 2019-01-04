@@ -383,6 +383,7 @@ public class Main extends JFrame implements ActionListener {
                 g.drawString("Generations: " + genCount, 500, 10);
                 g.drawString("Highest fitness: " + eval.highestScore, 500, 20);
                 g.drawString("Amount of Species: " + eval.species.size(), 500, 30);
+                g.drawString("Solution found genomes: " + eval.passedPopulation, 500, 40);
 
                 g.drawString("X: " + cars[fittestIndex].x, 10, 10);
                 g.drawString("Y: " + cars[fittestIndex].y, 10, 20);

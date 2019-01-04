@@ -2,6 +2,7 @@ import java.util.*;
 
 public class Genome {
 
+    public boolean foundSolution = false;
     public Map<Integer, ConnectionGene> connections;
     public Map<Integer, NodeGene> nodes;
 

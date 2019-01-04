@@ -4,7 +4,7 @@ public class Constants {
     public static final float C3 = 0.4f;
     public static final float DT = 4.0f;
     public static final float MUTATION_RATE = 0.8f;
-    public static final float ADD_CONNECTION_RATE = 0.05f;
+    public static final float ADD_CONNECTION_RATE = 0.1f;
     public static final float ADD_NODE_RATE = 0.01f;
     public static final int MAX_STAGNATION = 15;
     public static final float STAGNATION_DECAY = 0.08f;
