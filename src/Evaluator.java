@@ -50,7 +50,7 @@ public abstract class Evaluator {
         for(Genome g : genomes) {
             boolean foundSpecies = false;
             for (Species s : species) {
-                if (Genome.compatibilityDistance(g, s.mascot, Constants.C1, Constants.C2, Constants.C3) < Constants.DT) {
+                if (Genome.compatibilityDistance(g, s.mascot, Constants.C1, Constants.C2, Constants.C3) < Constants.DT ) {
                     s.members.add(g);
                     speciesMap.put(g, s);
                     foundSpecies = true;
@@ -76,6 +76,7 @@ public abstract class Evaluator {
             Species s = speciesMap.get(genomes.get(i));
 
             float score = evaluateGenome(genomes.get(i), i);
+            if (score > Constants.MAX_FITNESS) s.foundSolution = true;
             float adjustedScore = score / s.members.size();
 
             s.addAdjustedFitness(adjustedScore);
@@ -86,6 +87,13 @@ public abstract class Evaluator {
                 fittestGenome = genomes.get(i);
                 fittestGenomeIndex = i;
             }
+        }
+
+        Species backupSpecie = species.get(0);
+        species.removeIf(s -> s.checkStagnation() && species.size()>1);
+        if (species.isEmpty()) species.add(backupSpecie);
+        if (species.size() == 1) {
+            species.get(0).stagnationGenCount = 0;
         }
 
         //best genomes gets a free pass
@@ -123,40 +131,17 @@ public abstract class Evaluator {
 
         genomes = nextGenGenomes;
         nextGenGenomes = new ArrayList<>();
-
-        for(Genome g : genomes) {
-            boolean foundSpecies = false;
-            for (Species s : species) {
-                if (Genome.compatibilityDistance(g, s.mascot, Constants.C1, Constants.C2, Constants.C3) < Constants.DT) {
-                    s.members.add(g);
-                    speciesMap.put(g, s);
-                    foundSpecies = true;
-                    break;
-                }
-            }
-            if (!foundSpecies) {
-                if (species.size() > 30) {
-                    System.out.println("oh no");
-                }
-                Species newSpecies = new Species(g);
-                newSpecies.id = counter;
-                counter++;
-                species.add(newSpecies);
-                speciesMap.put(g, newSpecies);
-            }
-        }
-
     }
 
     private Species getRandomSpeciesBiasedAF (Random random) {
         double completeWeight = 0.0;
         for(Species s : species) {
-            completeWeight += s.totalAdjustedFitness;
+            completeWeight += s.getTotalAdjustedFitness();
         }
         double r = Math.random() * completeWeight;
         double countWeight = 0.0;
         for (Species s : species) {
-            countWeight += s.totalAdjustedFitness;
+            countWeight += s.getTotalAdjustedFitness();
             if (countWeight >= r) {
                 return s;
             }
@@ -209,13 +194,20 @@ public abstract class Evaluator {
         public List<Genome> members;
         public List<FitnessGenome> fitnessPop;
         public float totalAdjustedFitness = 0f;
+        public float topFitness = 0;
+        public int stagnationGenCount = 0;
         public int id;
+        public boolean foundSolution = false;
 
         public Species(Genome mascot) {
             this.mascot = mascot;
             this.members = new LinkedList<>();
             this.members.add(mascot);
             this.fitnessPop = new ArrayList<>();
+        }
+
+        public float getTotalAdjustedFitness() {
+            return totalAdjustedFitness*(1.0f-stagnationGenCount*Constants.STAGNATION_DECAY);
         }
 
         public void addAdjustedFitness(float adjustedFitness) {
@@ -228,6 +220,21 @@ public abstract class Evaluator {
             members.clear();
             fitnessPop.clear();
             totalAdjustedFitness = 0;
+        }
+
+        public boolean checkStagnation() {
+            if (foundSolution) {
+                stagnationGenCount = 0;
+                return false;
+            }
+            if (totalAdjustedFitness > topFitness) {
+                topFitness = totalAdjustedFitness;
+                stagnationGenCount = 0;
+            } else {
+                stagnationGenCount++;
+                if (stagnationGenCount > Constants.MAX_STAGNATION) return true;
+            }
+            return false;
         }
     }
 }

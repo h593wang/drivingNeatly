@@ -27,7 +27,7 @@ public class Main extends JFrame implements ActionListener {
     public Evaluator eval;
     public NeuralNetwork [] neuralNetworks = new NeuralNetwork[populationSize];
     public int genCount = 0;
-    public int fittestIndex;
+    public int fittestIndex = 0;
     public int highestScore;
     private DrawCanvas canvas;
     public boolean debug = false;
@@ -70,18 +70,6 @@ public class Main extends JFrame implements ActionListener {
     //narrows
             new Boundry( 611,345,911, 345),
             new Boundry( 594,402, 911, 402),
-    };
-
-    Color [] speciesColors = new Color[] {
-            Color.ORANGE,
-            Color.YELLOW,
-            Color.BLUE,
-            Color.BLACK,
-            Color.RED,
-            Color.CYAN,
-            Color.MAGENTA,
-            Color.PINK,
-            Color.GRAY,
     };
 
     public Main() {
@@ -165,6 +153,12 @@ public class Main extends JFrame implements ActionListener {
                 if (keyCode == KeyEvent.VK_S) {
                     S = true;
                 }
+                if (keyCode == KeyEvent.VK_E) {
+                    timer.setInitialDelay(Constants.FRAME_RATE_FAST);
+                }
+                if (keyCode == KeyEvent.VK_Q) {
+                    timer.setInitialDelay(Constants.FRAME_RATE_SLOW);
+                }
             }
 
             @Override
@@ -184,8 +178,8 @@ public class Main extends JFrame implements ActionListener {
                 }
             }
         });
-        timer = new Timer(40, this);
-        timer.setInitialDelay(Constants.FRAME_RATE);
+        timer = new Timer(0, this);
+        timer.setInitialDelay(Constants.FRAME_RATE_FAST);
         timer.start();
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -295,7 +289,6 @@ public class Main extends JFrame implements ActionListener {
                 for (int i = 0; i < populationSize; i++) {
                     cars[i] = new Car();
 
-                    cars[i].color = speciesColors[eval.speciesMap.get(eval.genomes.get(i)).id % speciesColors.length];
                     final int carIndex = i;
                     neuralNetworks[i] = new NeuralNetwork(eval.genomes.get(carIndex)) {
                         @Override
@@ -325,6 +318,9 @@ public class Main extends JFrame implements ActionListener {
         } else if (car.level == 3 && car.y < 500) {
             //right narrow
             car.level = 4;
+        } else if (car.level == 4 && car.x > 911) {
+            car.level = 5;
+            car.color = Color.GREEN;
         }
     }
 
@@ -338,7 +334,7 @@ public class Main extends JFrame implements ActionListener {
             return 950+550 + (int) (1150 - car.x);
         } else if (level == 3) {
             return (int) (950+550+1020+(835-car.y));
-        } else if (level == 4) {
+        } else if (level == 4 || level == 5) {
             return 950+550+1020+385 + (int) (car.x-80);
         }
         return fitness;
@@ -378,7 +374,7 @@ public class Main extends JFrame implements ActionListener {
                 }
                 cars[fittestIndex].color = Color.GREEN;
                 paintCar(g, cars[fittestIndex]);
-                cars[fittestIndex].color = Color.ORANGE;
+                if (cars[fittestIndex].level != 5) cars[fittestIndex].color = Color.ORANGE;
                 paintVision(g, cars[fittestIndex]);
                 g.setColor(Color.black);
                 paintObstacles(g);

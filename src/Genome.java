@@ -29,7 +29,7 @@ public class Genome {
     public void mutation(Random r) {
         for (ConnectionGene connection:connections.values()) {
             if (r.nextFloat() < Constants.PROBABILITY_PRETURBING) {
-                connection.weight *= r.nextFloat()*4.0f - 2.0f;
+                connection.weight += (r.nextFloat() - 0.5f)/10;
             } else {
                 connection.weight = r.nextFloat() * 4.0f - 2.0f;
             }
@@ -174,6 +174,9 @@ public class Genome {
         for (ConnectionGene parent1Node : parent1.connections.values()) {
             if (parent2.connections.containsKey(parent1Node.innovation)) { // matching gene
                 ConnectionGene childConGene = r.nextBoolean() ? new ConnectionGene(parent1Node) : new ConnectionGene(parent2.connections.get(parent1Node.innovation));
+                if (!parent1Node.enabled || !parent2.connections.get(parent1Node.innovation).enabled && Math.random() > 0.25) {
+                    childConGene.disable();
+                }
                 child.connections.put(childConGene.innovation,childConGene);
             } else { // disjoint or excess gene
                 ConnectionGene childConGene = new ConnectionGene(parent1Node);
@@ -190,7 +193,7 @@ public class Genome {
         int Genome1Size = genome1.connections.size() + genome1.nodes.size();
         int Genome2Size = genome2.connections.size() + genome2.nodes.size();
         if (Genome1Size > 20 || Genome2Size > 20) {
-            //N = Math.max(Genome1Size,Genome2Size);
+           // N = Math.max(Genome1Size,Genome2Size);
         }
 
         int disjointGenes = 0;
