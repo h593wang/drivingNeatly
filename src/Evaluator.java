@@ -9,13 +9,15 @@ public abstract class Evaluator {
 
     private int populationSize;
 
-    private Map<Genome, Species> speciesMap;
+    public Map<Genome, Species> speciesMap;
     private Map<Genome, Float> scoreMap;
-    private List<Genome> genomes;
-    private List<Genome> nextGenGenomes;
+    public List<Genome> genomes;
+    public List<Genome> nextGenGenomes;
     public List<Species> species;
     public float highestScore;
     public Genome fittestGenome;
+    public int fittestGenomeIndex;
+    public int counter = 0;
 
     private Random random = new Random();
 
@@ -42,6 +44,7 @@ public abstract class Evaluator {
         nextGenGenomes.clear();
         highestScore = Integer.MIN_VALUE;
         fittestGenome = null;
+        fittestGenomeIndex = 0;
 
         //Placeing genomes into species
         for(Genome g : genomes) {
@@ -55,7 +58,12 @@ public abstract class Evaluator {
                 }
             }
             if (!foundSpecies) {
+                if (species.size() > 30) {
+                    System.out.println("oh no");
+                }
                 Species newSpecies = new Species(g);
+                newSpecies.id = counter;
+                counter++;
                 species.add(newSpecies);
                 speciesMap.put(g, newSpecies);
             }
@@ -64,18 +72,19 @@ public abstract class Evaluator {
         species.removeIf(s -> s.members.isEmpty());
 
         //evaluating genomes
-        for (Genome g: genomes) {
-            Species s = speciesMap.get(g);
+        for (int i = 0; i < genomes.size(); i++) {
+            Species s = speciesMap.get(genomes.get(i));
 
-            float score = evaluateGenome(g);
+            float score = evaluateGenome(genomes.get(i), i);
             float adjustedScore = score / s.members.size();
 
             s.addAdjustedFitness(adjustedScore);
-            s.fitnessPop.add(new FitnessGenome(g, adjustedScore));
-            scoreMap.put(g, adjustedScore);
+            s.fitnessPop.add(new FitnessGenome(genomes.get(i), adjustedScore));
+            scoreMap.put(genomes.get(i), adjustedScore);
             if (score > highestScore) {
                 highestScore = score;
-                fittestGenome = g;
+                fittestGenome = genomes.get(i);
+                fittestGenomeIndex = i;
             }
         }
 
@@ -115,6 +124,28 @@ public abstract class Evaluator {
         genomes = nextGenGenomes;
         nextGenGenomes = new ArrayList<>();
 
+        for(Genome g : genomes) {
+            boolean foundSpecies = false;
+            for (Species s : species) {
+                if (Genome.compatibilityDistance(g, s.mascot, Constants.C1, Constants.C2, Constants.C3) < Constants.DT) {
+                    s.members.add(g);
+                    speciesMap.put(g, s);
+                    foundSpecies = true;
+                    break;
+                }
+            }
+            if (!foundSpecies) {
+                if (species.size() > 30) {
+                    System.out.println("oh no");
+                }
+                Species newSpecies = new Species(g);
+                newSpecies.id = counter;
+                counter++;
+                species.add(newSpecies);
+                speciesMap.put(g, newSpecies);
+            }
+        }
+
     }
 
     private Species getRandomSpeciesBiasedAF (Random random) {
@@ -149,7 +180,7 @@ public abstract class Evaluator {
         throw new RuntimeException("Couldn't find a genome");
     }
 
-    abstract int evaluateGenome(Genome genome);
+    abstract int evaluateGenome(Genome genome, int index);
 
     public class FitnessGenome {
         public float fitness;
@@ -178,6 +209,7 @@ public abstract class Evaluator {
         public List<Genome> members;
         public List<FitnessGenome> fitnessPop;
         public float totalAdjustedFitness = 0f;
+        public int id;
 
         public Species(Genome mascot) {
             this.mascot = mascot;

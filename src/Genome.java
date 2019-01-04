@@ -5,8 +5,8 @@ public class Genome {
     public Map<Integer, ConnectionGene> connections;
     public Map<Integer, NodeGene> nodes;
 
-    private static ArrayList<Integer> helperList1 = new ArrayList<>();
-    private static ArrayList<Integer> helperList2 = new ArrayList<>();
+    private static ArrayList<Integer> tmpList1 = new ArrayList<>();
+    private static ArrayList<Integer> tmpList2 = new ArrayList<>();
 
     public Genome() {
         nodes = new HashMap<>();
@@ -85,11 +85,65 @@ public class Genome {
             ConnectionGene con = new ConnectionGene(reversed ? node2.id : node1.id, reversed ? node1.id : node2.id,
                     r.nextFloat() * 2f - 1f, true, counter.getInnovation());
             connections.put(con.innovation, con);
-            success = true;
+            if (isCyclic()) {
+                connections.remove(con.innovation);
+                System.out.println("Tried, but would cause cyclic");
+            } else {
+                success = true;
+            }
         }
         if (!success) {
-            System.out.println("Tried, but could not add more connections");
+                System.out.println("Tried, but could not add more connections");
         }
+    }
+
+    public boolean isCyclicUtil(int i, Map <Integer, Boolean> visited, Map <Integer, Boolean>recStack) {
+
+        // Mark the current node as visited and
+        // part of recursion stack
+        if (recStack.get(i) != null && recStack.get(i))
+            return true;
+        if (visited.get(i) != null && visited.get(i))
+            return false;
+
+        recStack.put(i, true);
+        visited.put(i, true);
+
+        List<Integer> children = new ArrayList<>();
+        for (ConnectionGene con:connections.values()) {
+            if (con.inNode == nodes.get(i).id) {
+                children.add(con.outNode);
+            }
+        }
+
+        for (Integer c: children) {
+            if (isCyclicUtil(c, visited, recStack)) {
+                return true;
+            }
+        }
+
+        recStack.put(i, false);
+
+        return false;
+    }
+
+    public boolean isCyclic()
+    {
+        // Mark all the vertices as not visited and
+        // not part of recursion stack
+        Map <Integer, Boolean> visited = new HashMap<>();
+        Map <Integer, Boolean> recStack = new HashMap<>();
+
+        NodeGene [] nodesArray = new NodeGene[nodes.size()];
+        nodes.values().toArray(nodesArray);
+
+        // Call the recursive helper function to
+        // detect cycle in different DFS trees
+        for (int i = 0; i < nodes.size(); i++)
+            if (isCyclicUtil(nodesArray[i].id, visited, recStack))
+                return true;
+
+        return false;
     }
 
     public void addNodeMutation(Random r, Counter conCounter, Counter nodeCounter) {
@@ -129,6 +183,7 @@ public class Genome {
         return child;
     }
 
+
     public static float compatibilityDistance(Genome genome1, Genome genome2, float c1, float c2, float c3) {
 
         int N = 1;
@@ -143,17 +198,17 @@ public class Genome {
         float weightDiff = 0.0f;
         int excessGenes = 0;
 
-        helperList1.clear();
-        helperList1.ensureCapacity(genome1.nodes.size());
-        helperList1.addAll(genome1.nodes.keySet());
-        Collections.sort(helperList1);
-        helperList2.clear();
-        helperList2.ensureCapacity(genome2.nodes.size());
-        helperList2.addAll(genome2.nodes.keySet());
-        Collections.sort(helperList2);
+        tmpList1.clear();
+        tmpList1.ensureCapacity(genome1.nodes.size());
+        tmpList1.addAll(genome1.nodes.keySet());
+        Collections.sort(tmpList1);
+        tmpList2.clear();
+        tmpList2.ensureCapacity(genome2.nodes.size());
+        tmpList2.addAll(genome2.nodes.keySet());
+        Collections.sort(tmpList2);
 
-        int highestInnovation1 = helperList1.get(helperList1.size()-1);
-        int highestInnovation2 = helperList2.get(helperList2.size()-1);
+        int highestInnovation1 = tmpList1.get(tmpList1.size()-1);
+        int highestInnovation2 = tmpList2.get(tmpList2.size()-1);
         int indices = Math.max(highestInnovation1, highestInnovation2);
 
         for (int i = 0; i <= indices; i++) {
@@ -174,17 +229,17 @@ public class Genome {
             }
         }
 
-        helperList1.clear();
-        helperList1.ensureCapacity(genome1.connections.size());
-        helperList1.addAll(genome1.connections.keySet());
-        Collections.sort(helperList1);
-        helperList2.clear();
-        helperList2.ensureCapacity(genome2.connections.size());
-        helperList2.addAll(genome2.connections.keySet());
-        Collections.sort(helperList2);
+        tmpList1.clear();
+        tmpList1.ensureCapacity(genome1.connections.size());
+        tmpList1.addAll(genome1.connections.keySet());
+        Collections.sort(tmpList1);
+        tmpList2.clear();
+        tmpList2.ensureCapacity(genome2.connections.size());
+        tmpList2.addAll(genome2.connections.keySet());
+        Collections.sort(tmpList2);
 
-        highestInnovation1 = helperList1.get(helperList1.size()-1);
-        highestInnovation2 = helperList2.get(helperList2.size()-1);
+        highestInnovation1 = tmpList1.get(tmpList1.size()-1);
+        highestInnovation2 = tmpList2.get(tmpList2.size()-1);
         indices = Math.max(highestInnovation1, highestInnovation2);
         for (int i = 0; i <= indices; i++) {
             ConnectionGene connection1 = genome1.connections.get(i);
@@ -209,7 +264,5 @@ public class Genome {
         }
         return excessGenes * c1 / N + disjointGenes * c2 / N + c3 * weightDiff/matchingGenes;
     }
-
-
 }
 

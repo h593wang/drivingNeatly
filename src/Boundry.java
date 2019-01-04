@@ -67,7 +67,7 @@ public class Boundry {
 
     public Coord getIntercept(double initX, double initY, double endX, double endY) {
         if (endX - initX == xEnd - xInit && endX - initX == 0) return null;
-        if (endX - initX == 0) {
+        if (endX - initX > -0.01 && endX - initX < 0.01) {
             //vertical sightLine
             if (initX < Math.max(xEnd, xInit) && initX > Math.min(xEnd,xInit)) {
                 double boundrySlope = (yEnd - yInit)/(xEnd - xInit);
@@ -80,7 +80,7 @@ public class Boundry {
             }
             return null;
         }
-        if (xEnd - xInit == 0) {
+        if (xEnd - xInit > -0.01 && xEnd - xInit < 0.01) {
             //vertical Boundry
             if (xInit < Math.max(endX, initX) && xInit > Math.min(initX,endX)) {
                 double sightSlope = (endY - initY)/(endX - initX);

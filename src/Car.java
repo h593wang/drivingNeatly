@@ -10,13 +10,16 @@ public class Car {
     public int speed = 0;
     public int width = 20;
     public int length = 40;
-    public boolean crash = false;
-    public double [] sensors = new double[5];
+    public float [] sensors = new float[Constants.SENSOR_COUNT];
     public Color color = Color.ORANGE;
-    public Genome genome;
+    public int fitness = 0;
+    public boolean crashed = false;
+    public double savedFitness = 0;
+    public int inactiveCount = 0;
+    public int level = 0;
 
     public Car() {
-        x = 110;
+        x = 120;
         y = 175;
     }
 
@@ -45,7 +48,7 @@ public class Car {
 
 
     public void move() {
-        if (crash) {
+        if (crashed) {
             speed = 0;
             return;
         }
@@ -88,4 +91,15 @@ public class Car {
         }
     }
 
+    public boolean checkInactive() {
+        if (savedFitness >= fitness) {
+            inactiveCount++;
+            if (inactiveCount > Constants.INACTIVE_COUNT) {
+                return true;
+            }
+        } else {
+            if (fitness > savedFitness) savedFitness = fitness;
+        }
+        return false;
+    }
 }
