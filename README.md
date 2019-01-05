@@ -1,7 +1,7 @@
 # Driving NEATly
 
 
-Driving NEATly is an AI enabled driving simulation with simple self driving capabilities enabled by the NEAT algorithm.
+Driving NEATly is an AI based driving simulation with simple self driving capabilities enabled by the NEAT algorithm.
 The machine learning components includes:
   - Species feature and control to protect innovation
   - Mutation rate and genome specifications are adjustable
