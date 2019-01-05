@@ -87,7 +87,7 @@ public abstract class Evaluator {
             }
         }
 
-        Species backupSpecie = species.get(0);
+        Species backupSpecie = new Species(species.get(0));
         species.removeIf(s -> s.checkStagnation() && species.size()>1);
         if (species.isEmpty()) species.add(backupSpecie);
         if (species.size() == 1) {
@@ -214,6 +214,12 @@ public abstract class Evaluator {
             this.fitnessPop = new ArrayList<>();
         }
 
+        public Species(Species species) {
+            this.mascot = new Genome(species.mascot);
+            this.members = new LinkedList<>(species.members);
+            this.fitnessPop = new ArrayList<>(species.fitnessPop);
+        }
+
         public float getTotalAdjustedFitness() {
             return totalAdjustedFitness*(1.0f-stagnationGenCount*Constants.STAGNATION_DECAY);
         }
@@ -231,6 +237,14 @@ public abstract class Evaluator {
         }
 
         public boolean checkStagnation() {
+            boolean masterRace = true;
+            for (Genome g:members) {
+                if (!g.foundSolution) masterRace = false;
+            }
+            if (masterRace) {
+                stagnationGenCount = 0;
+                return false;
+            }
             if (totalAdjustedFitness > topFitness) {
                 topFitness = totalAdjustedFitness;
                 stagnationGenCount = 0;

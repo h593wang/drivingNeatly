@@ -17,7 +17,6 @@ public class Constants {
     public static final float ACTIVATION_THRESHOLD = 0.5f;
     public static final int FRAME_RATE_FAST = 1;
     public static final int FRAME_RATE_SLOW = 40;
-    //must be a multiple of 6
     public static final int FOV = 120;
     public static final int SENSOR_COUNT = 5;
     public static final boolean WITH_W_S = false;
