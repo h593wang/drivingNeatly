@@ -31,7 +31,7 @@ The changeable parameters are included in Constants.java:
 
 ### Resources Used
 
-- [Implementing NEAT algorithm in java] by Hydrozoa, used as a tutorial for implementation
+- [Implementing NEAT algorithm in java] by Hydrozoa, used as a tutorial for implementation, copied his NeuralNetwork.java
 - [Evolving Neural Networks through Augmenting Topologies] by Kenneth O. Stanley & Risto Miikkulainen 
 published in The MIT Press Journals, used as an algorithm explenation and analysis
 - [MarI/O - Machine Learning for Video Games] by Sethbling for inspiration and introduction to the topic
