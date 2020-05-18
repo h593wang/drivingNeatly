@@ -161,12 +161,12 @@ public abstract class Evaluator {
     private Genome getRandomGenomeBiasedAF (Species speciesFrom,Random random) {
         double completeWeight = 0.0;
         for(FitnessGenome s : speciesFrom.fitnessPop) {
-            completeWeight += s.fitness;
+            completeWeight += (s.fitness * s.fitness);
         }
         double r = Math.random() * completeWeight;
         double countWeight = 0.0;
         for (FitnessGenome s : speciesFrom.fitnessPop) {
-            countWeight += s.fitness;
+            countWeight += (s.fitness * s.fitness);
             if (countWeight >= r) {
                 return s.genome;
             }

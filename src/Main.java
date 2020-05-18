@@ -5,14 +5,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 
 
 public class Main extends JFrame implements ActionListener {
     // Define constants
     public static final int CANVAS_WIDTH  = 1270;
     public static final int CANVAS_HEIGHT = 980;
-    public static final int viewDist = 300;
+    public static final int viewDist = 900;
     public static final int populationSize = 200;
 
     public boolean W;
@@ -31,6 +30,22 @@ public class Main extends JFrame implements ActionListener {
     public int highestScore;
     private DrawCanvas canvas;
     public boolean debug = false;
+    public Boundry [] boundries2 = new Boundry[] {
+
+            new Boundry(100,100,200,100),
+            new Boundry(100,100,100,850),
+            new Boundry(200,100,200,650),
+
+            new Boundry(100,850,1200,850),
+            new Boundry(200,650,800,650),
+
+
+            new Boundry(1200,850,1050,300),
+            new Boundry(800,650,950,300),
+
+            new Boundry(950,300,950,100),
+            new Boundry(1050,300,1050,100),
+    };
     public Boundry [] boundries = new Boundry[] {
 
             new Boundry(100,100,100,250),
@@ -76,8 +91,7 @@ public class Main extends JFrame implements ActionListener {
         //initalize the shit here
 
         if (debug) {
-
-            car = new Car(110,175);
+            car = new Car(90);
         } else {
             Counter nodeInn = new Counter();
             Counter connInn = new Counter();
@@ -286,8 +300,14 @@ public class Main extends JFrame implements ActionListener {
                 if (genCount % 20 == 0)
                     GenomePrinter.printGenome(eval.fittestGenome, "D:\\storage\\MLTESTING\\" + genCount + ".png");
                 eval.evaluate();
+                int angle = 0;
+                if (eval.passedPopulation == populationSize) {
+                    angle = 90;
+                    boundries = boundries2;
+                    timer.setInitialDelay(Constants.FRAME_RATE_SLOW);
+                }
                 for (int i = 0; i < populationSize; i++) {
-                    cars[i] = new Car();
+                    cars[i] = new Car(angle);
 
                     final int carIndex = i;
                     neuralNetworks[i] = new NeuralNetwork(eval.genomes.get(carIndex)) {

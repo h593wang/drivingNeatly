@@ -23,6 +23,12 @@ public class Car {
         y = 175;
     }
 
+    public Car(int angle) {
+        x = 120;
+        y = 175;
+        rotation = angle;
+    }
+
     public Car(int x, int y) {
         this.x = x;
         this.y = y;
